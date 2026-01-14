@@ -34,6 +34,7 @@ const BlogPage: React.FC = () => {
     null
   );
   const [posting, setPosting] = useState(false);
+  const [viewImage, setViewImage] = useState<string | null>(null);
 
   useEffect(() => {
     dispatch(fetchBlogs());
@@ -100,7 +101,7 @@ const BlogPage: React.FC = () => {
             image_url: image_url ?? editingBlog.image_url,
           })
         );
-        await dispatch(fetchBlogs()); 
+        await dispatch(fetchBlogs());
         setEditingBlog(null);
       } else {
         await dispatch(
@@ -228,6 +229,11 @@ const BlogPage: React.FC = () => {
                   src={blog.image_url}
                   alt={blog.title}
                   className="post-image"
+                  onClick={(e) => {
+                    e.stopPropagation(); 
+                    setViewImage(blog.image_url!);
+                  }}
+                  style={{ cursor: "zoom-in" }}
                 />
               )}
 
@@ -370,6 +376,16 @@ const BlogPage: React.FC = () => {
           </div>
         </div>
       )}
+ {viewImage && (
+  <div className="modal-overlay" onClick={() => setViewImage(null)}>
+    <img
+      src={viewImage}
+      alt="Full view"
+      className="modal-image"
+      onClick={() => setViewImage(null)}
+    />
+  </div>
+)}
     </div>
   );
 };
