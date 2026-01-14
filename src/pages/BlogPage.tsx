@@ -92,7 +92,15 @@ const BlogPage: React.FC = () => {
 
     try {
       if (editingBlog) {
-        await dispatch(updateBlog({ ...editingBlog, title, content, image_url }));
+        await dispatch(
+          updateBlog({
+            ...editingBlog,
+            title,
+            content,
+            image_url: image_url ?? editingBlog.image_url,
+          })
+        );
+        await dispatch(fetchBlogs()); 
         setEditingBlog(null);
       } else {
         await dispatch(
@@ -111,7 +119,8 @@ const BlogPage: React.FC = () => {
       setImageFile(null);
       setShowEditorModal(false);
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "Failed to create blog post";
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to create blog post";
       console.error("Blog creation failed:", errorMessage);
       alert(errorMessage);
     } finally {
