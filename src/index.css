@@ -362,7 +362,7 @@ body {
   justify-content: center;
   align-items: center;
   z-index: 9999;
-  cursor: zoom-out;
+  cursor: pointer;
   padding: 10px;
   box-sizing: border-box;
   overflow: auto;
@@ -375,7 +375,7 @@ body {
   max-height: 100%;
   object-fit: contain;
   border-radius: 10px;
-  cursor: zoom-out;
+  cursor: pointer;
   display: block;
 }
 
@@ -418,6 +418,14 @@ body {
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin-bottom: 15px;
+}
+.image-preview {
+  width: 100%;
+  max-height: 300px;
+  object-fit: contain;
+  margin-top: 10px;
+  border-radius: 8px;
+  cursor: pointer;
 }
 
 @keyframes spin {

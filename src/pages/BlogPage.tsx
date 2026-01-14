@@ -221,7 +221,7 @@ const BlogPage: React.FC = () => {
             <div
               key={blog.id}
               className="post-card"
-              style={{ marginBottom: "20px" }}
+              style={{ marginBottom: "20px", cursor: "pointer" }}
               onClick={() => handleCardClick(blog.id)}
             >
               {blog.image_url && (
@@ -230,10 +230,10 @@ const BlogPage: React.FC = () => {
                   alt={blog.title}
                   className="post-image"
                   onClick={(e) => {
-                    e.stopPropagation(); 
+                    e.stopPropagation();
                     setViewImage(blog.image_url!);
                   }}
-                  style={{ cursor: "zoom-in" }}
+                  style={{ cursor: "pointer" }}
                 />
               )}
 
@@ -334,6 +334,24 @@ const BlogPage: React.FC = () => {
               accept="image/*"
               onChange={(e) => setImageFile(e.target.files?.[0] || null)}
             />
+            {imageFile && (
+              <img
+                src={URL.createObjectURL(imageFile)}
+                alt="Preview"
+                className="image-preview"
+                onClick={() => setViewImage(URL.createObjectURL(imageFile))}
+              />
+            )}
+
+            {!imageFile && editingBlog?.image_url && (
+              <img
+                src={editingBlog.image_url}
+                alt="Existing"
+                className="image-preview"
+                onClick={() => setViewImage(editingBlog.image_url!)}
+              />
+            )}
+
             <div style={{ marginTop: "12px" }}>
               <button
                 className="blog-btn"
@@ -376,16 +394,16 @@ const BlogPage: React.FC = () => {
           </div>
         </div>
       )}
- {viewImage && (
-  <div className="modal-overlay" onClick={() => setViewImage(null)}>
-    <img
-      src={viewImage}
-      alt="Full view"
-      className="modal-image"
-      onClick={() => setViewImage(null)}
-    />
-  </div>
-)}
+      {viewImage && (
+        <div className="modal-overlay" onClick={() => setViewImage(null)}>
+          <img
+            src={viewImage}
+            alt="Full view"
+            className="modal-image"
+            onClick={() => setViewImage(null)}
+          />
+        </div>
+      )}
     </div>
   );
 };
