@@ -8,7 +8,7 @@ export interface Blog {
   user_id: string;
   user_name: string;
   created_at: string;
-  image_url?: string; // optional image
+  image_url?: string | null;
 }
 
 interface BlogState {
@@ -21,7 +21,7 @@ const initialState: BlogState = {
   loading: false,
 };
 
-// Fetch blogs
+
 export const fetchBlogs = createAsyncThunk("blog/fetchBlogs", async () => {
   const { data, error } = await supabase
     .from("blogs")
@@ -31,7 +31,6 @@ export const fetchBlogs = createAsyncThunk("blog/fetchBlogs", async () => {
   return data as Blog[];
 });
 
-// Create blog
 export const createBlog = createAsyncThunk(
   "blog/createBlog",
   async ({
@@ -55,12 +54,11 @@ export const createBlog = createAsyncThunk(
       .select("*");
 
     if (error) throw error;
-    return data?.[0] as Blog; // return first element
+    return data?.[0] as Blog; 
   }
 );
 
 
-// Update blog
 export const updateBlog = createAsyncThunk(
   "blog/updateBlog",
   async (blog: Blog) => {
@@ -79,7 +77,7 @@ export const updateBlog = createAsyncThunk(
   }
 );
 
-// Delete blog
+
 export const deleteBlog = createAsyncThunk(
   "blog/deleteBlog",
   async (id: number) => {

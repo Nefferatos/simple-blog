@@ -59,6 +59,12 @@ const BlogPage: React.FC = () => {
     setImageFile(null);
     setShowEditorModal(true);
   };
+  const handleRemoveImage = () => {
+    setImageFile(null);
+    if (editingBlog) {
+      setEditingBlog({ ...editingBlog, image_url: null });
+    }
+  };
 
   const handlePost = async () => {
     if (!userId) {
@@ -335,21 +341,37 @@ const BlogPage: React.FC = () => {
               onChange={(e) => setImageFile(e.target.files?.[0] || null)}
             />
             {imageFile && (
-              <img
-                src={URL.createObjectURL(imageFile)}
-                alt="Preview"
-                className="image-preview"
-                onClick={() => setViewImage(URL.createObjectURL(imageFile))}
-              />
+              <div style={{ position: "relative" }}>
+                <img
+                  src={URL.createObjectURL(imageFile)}
+                  alt="Preview"
+                  className="image-preview pointer-cursor"
+                  onClick={() => setViewImage(URL.createObjectURL(imageFile))}
+                />
+                <button
+                  className="remove-image-btn"
+                  onClick={handleRemoveImage}
+                >
+                  Remove
+                </button>
+              </div>
             )}
 
             {!imageFile && editingBlog?.image_url && (
-              <img
-                src={editingBlog.image_url}
-                alt="Existing"
-                className="image-preview"
-                onClick={() => setViewImage(editingBlog.image_url!)}
-              />
+              <div style={{ position: "relative" }}>
+                <img
+                  src={editingBlog.image_url}
+                  alt="Existing"
+                  className="image-preview pointer-cursor"
+                  onClick={() => setViewImage(editingBlog.image_url!)}
+                />
+                <button
+                  className="remove-image-btn"
+                  onClick={handleRemoveImage}
+                >
+                  Remove
+                </button>
+              </div>
             )}
 
             <div style={{ marginTop: "12px" }}>
