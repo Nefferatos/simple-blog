@@ -5,6 +5,7 @@ const AuthPage: React.FC = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [username, setUsername] = useState(''); // new username state
   const [message, setMessage] = useState('');
 
   const handleLogin = async () => {
@@ -14,7 +15,13 @@ const AuthPage: React.FC = () => {
   };
 
   const handleRegister = async () => {
-    const { error } = await supabase.auth.signUp({ email, password });
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: { username }, // store username in metadata
+      },
+    });
     if (error) setMessage(error.message);
     else setMessage('Registered successfully. Check your email.');
   };
@@ -36,12 +43,27 @@ const AuthPage: React.FC = () => {
         value={password}
         onChange={(e) => setPassword(e.target.value)}
       />
+      {!isLogin && (
+        <input
+          className="auth-input"
+          type="text"
+          placeholder="Username"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+        />
+      )}
       <button onClick={isLogin ? handleLogin : handleRegister}>
         {isLogin ? 'Login' : 'Register'}
       </button>
       <p>
         {isLogin ? "Don't have an account?" : 'Already have an account?'}{' '}
-        <span className="auth-link" onClick={() => { setIsLogin(!isLogin); setMessage(''); }}>
+        <span
+          className="auth-link"
+          onClick={() => {
+            setIsLogin(!isLogin);
+            setMessage('');
+          }}
+        >
           {isLogin ? 'Register' : 'Login'}
         </span>
       </p>
