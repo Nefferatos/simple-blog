@@ -7,7 +7,8 @@ export interface Comment {
   content: string;
   user_id: string;
   user_name: string;
-  created_at: string;
+  created_at: string | null;
+  image_url?: string | null;
 }
 
 interface CommentState {
@@ -32,25 +33,38 @@ export const fetchComments = createAsyncThunk(
     return data as Comment[];
   }
 );
-
 export const createComment = createAsyncThunk(
   "comment/createComment",
-  async ({
-    blog_id,
-    content,
-    user_id,
-    user_name,
-  }: {
+  async (payload: {
     blog_id: number;
     content: string;
     user_id: string;
     user_name: string;
+    file?: File | null;
   }) => {
+    const { blog_id, content, user_id, user_name, file } = payload;
+
     if (!user_id) throw new Error("User not logged in");
+
+    let image_url: string | null = null;
+
+    if (file) {
+      const ext = file.name.split(".").pop();
+      const fileName = `comment-${Date.now()}.${ext}`;
+      const { error: uploadError } = await supabase.storage
+        .from("comment-images")
+        .upload(fileName, file, { upsert: true });
+      if (uploadError) throw uploadError;
+
+      const { data: publicData } = supabase.storage
+        .from("comment-images")
+        .getPublicUrl(fileName);
+      image_url = publicData.publicUrl;
+    }
 
     const { data, error } = await supabase
       .from("comments")
-      .insert([{ blog_id, content, user_id, user_name }])
+      .insert([{ blog_id, content, user_id, user_name, image_url }])
       .select("*");
 
     if (error) throw error;
@@ -60,13 +74,37 @@ export const createComment = createAsyncThunk(
 
 export const updateComment = createAsyncThunk(
   "comment/updateComment",
-  async (comment: Comment) => {
+  async (payload: {
+    id: number;
+    content: string;
+    file?: File | null;
+    removeImage?: boolean;
+  }) => {
+    let image_url: string | null = null;
+
+    if (payload.removeImage) {
+      image_url = null;
+    } else if (payload.file) {
+      const ext = payload.file.name.split(".").pop();
+      const fileName = `comment-${Date.now()}.${ext}`;
+      const { error: uploadError } = await supabase.storage
+        .from("comment-images")
+        .upload(fileName, payload.file, { upsert: true });
+      if (uploadError) throw uploadError;
+
+      const { data: publicData } = supabase.storage
+        .from("comment-images")
+        .getPublicUrl(fileName);
+      image_url = publicData.publicUrl;
+    }
+
     const { data, error } = await supabase
       .from("comments")
-      .update({ content: comment.content })
-      .eq("id", comment.id)
+      .update({ content: payload.content, image_url })
+      .eq("id", payload.id)
       .select()
       .single();
+
     if (error) throw error;
     return data as Comment;
   }
